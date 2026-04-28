@@ -12,7 +12,7 @@ def sjf(processes):
 
         # If no process is ready → CPU idle
         if not ready_queue:
-            current_time += 1
+            current_time = processes[0]["arrival_time"]
             continue
 
         # Pick process with shortest burst time
@@ -35,6 +35,9 @@ def sjf(processes):
         })
 
         current_time = finish_time
+
+    if not results:
+        return [], 0, 0
 
     avg_tat = sum(r["turnaround_time"] for r in results) / len(results)
     avg_wt = sum(r["waiting_time"] for r in results) / len(results)
