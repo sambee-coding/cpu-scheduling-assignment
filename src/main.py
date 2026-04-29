@@ -1,7 +1,7 @@
 import copy
 from models import Process
 from fcfs import fcfs
-from sjf import sjf
+from sjf import sjf_non_preemptive
 from srtf import srtf
 from round_robin import round_robin
 # Import Banker's algorithm from friend's file
@@ -13,11 +13,35 @@ except ImportError:
 def get_scheduling_data():
     """Returns sample process data for scheduling."""
     return [
-        Process(pid=1, arrival_time=0, burst_time=8),
-        Process(pid=2, arrival_time=1, burst_time=4),
-        Process(pid=3, arrival_time=2, burst_time=9),
-        Process(pid=4, arrival_time=3, burst_time=5),
+        Process(pid=1, arrival_time=0, burst_time=7),
+        Process(pid=2, arrival_time=2, burst_time=4),
+        Process(pid=3, arrival_time=4, burst_time=1),
+        Process(pid=4, arrival_time=5, burst_time=4),
     ]
+
+def input_processes():
+    """Reads process data from the terminal."""
+    processes = []
+    print("\n--- Manual Process Entry ---")
+    print("Format: <PID> <Arrival_Time> <Burst_Time> (e.g., P1 0 7)")
+    print("Type 'done' to finish.")
+    
+    while True:
+        line = input("> ").strip()
+        if line.lower() == 'done':
+            break
+        try:
+            parts = line.split()
+            if len(parts) == 3:
+                pid = parts[0]
+                at = int(parts[1])
+                bt = int(parts[2])
+                processes.append(Process(pid=pid, arrival_time=at, burst_time=bt))
+            else:
+                print("Invalid format. Use: PID AT BT")
+        except ValueError:
+            print("Invalid input. Arrival and Burst must be integers.")
+    return processes
 
 def run_bankers():
     """Runs the Banker's algorithm simulation if the module exists."""
@@ -61,7 +85,7 @@ def main():
     
     algorithms = [
         ("FIRST COME FIRST SERVED (FCFS)", fcfs),
-        ("SHORTEST JOB FIRST (SJF)", sjf),
+        ("SHORTEST JOB FIRST (SJF)", sjf_non_preemptive),
         ("SHORTEST REMAINING TIME FIRST (SRTF)", srtf),
         ("ROUND ROBIN (RR) - Q=2", round_robin),
     ]

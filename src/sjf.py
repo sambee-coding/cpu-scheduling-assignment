@@ -1,6 +1,6 @@
 from models import Process, calculate_metrics, print_table, print_gantt_chart
 
-def sjf(processes: list[Process]):
+def sjf_non_preemptive(processes: list[Process]):
     """
     Implementation of Shortest Job First (SJF) scheduling algorithm (Non-preemptive).
     """
