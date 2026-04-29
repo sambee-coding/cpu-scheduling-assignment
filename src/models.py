@@ -40,13 +40,10 @@ def print_gantt_chart(gantt_chart: list[tuple[int, int, str]]):
     gantt_chart: List of (start_time, end_time, label)
     """
     print("\n--- Gantt Chart ---")
-    
-    # Print the boxes
     for _, _, label in gantt_chart:
         print(f"|  {label}  ", end="")
     print("|")
-    
-    # Print the timeline
     for start, _, _ in gantt_chart:
         print(f"{start:<8}", end="")
-    print(gantt_chart[-1][1])  # Final completion time
+    if gantt_chart:
+        print(gantt_chart[-1][1])

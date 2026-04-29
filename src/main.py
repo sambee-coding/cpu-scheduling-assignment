@@ -1,96 +1,76 @@
 import copy
-from models import Process, print_table
-# Import the scheduling algorithms
-# Note: These imports will work once the files exist in your branch
-try:
-    from fcfs import fcfs
-    from sjf import sjf
-except ImportError:
-    # Placeholders if files aren't merged yet
-    def fcfs(p): print("\n[!] FCFS implementation missing in this branch")
-    def sjf(p): print("\n[!] SJF implementation missing in this branch")
-
+from models import Process
+from fcfs import fcfs
+from sjf import sjf
 from srtf import srtf
 from round_robin import round_robin
 
+def get_sample_data():
+    """Returns a predefined list of Process objects for simulation."""
+    return [
+        Process(pid=1, arrival_time=0, burst_time=8),
+        Process(pid=2, arrival_time=1, burst_time=4),
+        Process(pid=3, arrival_time=2, burst_time=9),
+        Process(pid=4, arrival_time=3, burst_time=5),
+    ]
+
 def get_user_input():
-    """
-    Reads process data from the user.
-    Format: ID ArrivalTime BurstTime (e.g., P1 0 7)
-    Enter 'done' to finish.
-    """
+    """Reads process data from the terminal."""
     processes = []
-    print("\n--- Enter Process Data ---")
-    print("Format: <ID> <Arrival_Time> <Burst_Time> (e.g., P1 0 7)")
-    print("Type 'done' when finished.")
+    print("\n--- Manual Process Entry ---")
+    print("Format: <PID_as_integer> <Arrival_Time> <Burst_Time> (e.g., 1 0 7)")
+    print("Type 'done' to finish.")
     
     while True:
-        line = input("> ").strip()
-        if line.lower() == 'done':
+        line = input("> ").strip().lower()
+        if line == 'done':
             break
-        
         try:
-            parts = line.split()
-            if len(parts) != 3:
-                print("Invalid format. Please use: ID Arrival Burst")
-                continue
-            
-            pid, at, bt = parts[0], int(parts[1]), int(parts[2])
-            # Store as dictionaries as per team agreement
-            processes.append({
-                'id': pid,
-                'at': at,
-                'bt': bt
-            })
+            parts = list(map(int, line.split()))
+            if len(parts) == 3:
+                processes.append(Process(pid=parts[0], arrival_time=parts[1], burst_time=parts[2]))
+            else:
+                print("Invalid format. Use: PID AT BT")
         except ValueError:
-            print("Invalid input. Arrival and Burst times must be integers.")
-            
+            print("Invalid input. Please enter integers only.")
     return processes
 
-def convert_to_models(process_dicts):
-    """Converts dictionaries to Process objects for the algorithms."""
-    return [Process(pid=p['id'], arrival_time=p['at'], burst_time=p['bt']) for p in process_dicts]
-
-def main():
-    print("=" * 40)
-    print("   CPU SCHEDULING ALGORITHM SIMULATOR   ")
-    print("=" * 40)
+def run_simulation():
+    print("=" * 60)
+    print("        OS CPU SCHEDULING ALGORITHM SIMULATOR")
+    print("=" * 60)
     
-    # Input Data
-    # For quick testing, you can uncomment the sample data below:
-    # raw_processes = [
-    #     {'id': 'P1', 'at': 0, 'bt': 8},
-    #     {'id': 'P2', 'at': 1, 'bt': 4},
-    #     {'id': 'P3', 'at': 2, 'bt': 9},
-    #     {'id': 'P4', 'at': 3, 'bt': 5},
-    # ]
-    
-    raw_processes = get_user_input()
-    
-    if not raw_processes:
-        print("No processes entered. Exiting.")
+    # Choose input method
+    choice = input("Use sample data? (y/n): ").strip().lower()
+    if choice == 'y':
+        original_processes = get_sample_data()
+    else:
+        original_processes = get_user_input()
+        
+    if not original_processes:
+        print("No processes to schedule. Exiting.")
         return
 
+    # List of algorithms to run
     algorithms = [
-        ("First Come First Served (FCFS)", fcfs),
-        ("Shortest Job First (SJF)", sjf),
-        ("Shortest Remaining Time First (SRTF)", srtf),
+        ("FIRST COME FIRST SERVED (FCFS)", fcfs),
+        ("SHORTEST JOB FIRST (SJF)", sjf),
+        ("SHORTEST REMAINING TIME FIRST (SRTF)", srtf),
+        ("ROUND ROBIN (RR) - Quantum = 2", round_robin),
     ]
 
     for name, func in algorithms:
-        print(f"\n{'#' * 10} {name} {'#' * 10}")
-        # Always pass a deep copy to avoid one algorithm affecting the next
-        proc_copy = convert_to_models(copy.deepcopy(raw_processes))
-        func(proc_copy)
-        print("-" * 50)
+        print(f"\n\n{'#' * 15} {name} {'#' * 15}")
+        
+        # Deep copy to ensure each algorithm starts with fresh data
+        process_list_copy = copy.deepcopy(original_processes)
+        
+        # Execute the algorithm
+        func(process_list_copy)
+        
+        print(f"\n{'=' * 60}")
 
-    # Round Robin handled separately due to Quantum
-    print(f"\n{'#' * 10} Round Robin (Quantum = 2) {'#' * 10}")
-    rr_proc = convert_to_models(copy.deepcopy(raw_processes))
-    round_robin(rr_proc, quantum=2)
-    print("-" * 50)
-
-    print("\nSimulation Complete.")
+    print("\nSimulation completed successfully.")
 
 if __name__ == "__main__":
-    main()
+    run_simulation()
