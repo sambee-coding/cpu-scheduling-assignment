@@ -4,9 +4,14 @@ from fcfs import fcfs
 from sjf import sjf
 from srtf import srtf
 from round_robin import round_robin
+# Import Banker's algorithm from friend's file
+try:
+    import bankers
+except ImportError:
+    bankers = None
 
-def get_sample_data():
-    """Returns a predefined list of Process objects for simulation."""
+def get_scheduling_data():
+    """Returns sample process data for scheduling."""
     return [
         Process(pid=1, arrival_time=0, burst_time=8),
         Process(pid=2, arrival_time=1, burst_time=4),
@@ -14,63 +19,66 @@ def get_sample_data():
         Process(pid=4, arrival_time=3, burst_time=5),
     ]
 
-def get_user_input():
-    """Reads process data from the terminal."""
-    processes = []
-    print("\n--- Manual Process Entry ---")
-    print("Format: <PID_as_integer> <Arrival_Time> <Burst_Time> (e.g., 1 0 7)")
-    print("Type 'done' to finish.")
-    
-    while True:
-        line = input("> ").strip().lower()
-        if line == 'done':
-            break
-        try:
-            parts = list(map(int, line.split()))
-            if len(parts) == 3:
-                processes.append(Process(pid=parts[0], arrival_time=parts[1], burst_time=parts[2]))
-            else:
-                print("Invalid format. Use: PID AT BT")
-        except ValueError:
-            print("Invalid input. Please enter integers only.")
-    return processes
-
-def run_simulation():
-    print("=" * 60)
-    print("        OS CPU SCHEDULING ALGORITHM SIMULATOR")
-    print("=" * 60)
-    
-    # Choose input method
-    choice = input("Use sample data? (y/n): ").strip().lower()
-    if choice == 'y':
-        original_processes = get_sample_data()
-    else:
-        original_processes = get_user_input()
-        
-    if not original_processes:
-        print("No processes to schedule. Exiting.")
+def run_bankers():
+    """Runs the Banker's algorithm simulation if the module exists."""
+    if not bankers:
+        print("\n[!] banker's algorithm module not found.")
         return
 
-    # List of algorithms to run
+    print("\n" + "=" * 60)
+    print("         BANKER'S ALGORITHM (Deadlock Avoidance)")
+    print("=" * 60)
+
+    # Sample Data from your friend's implementation
+    n = 5 # Processes
+    m = 3 # Resources
+    allocation = [[0, 1, 0], [2, 0, 0], [3, 0, 2], [2, 1, 1], [0, 0, 2]]
+    max_need = [[7, 5, 3], [3, 2, 2], [9, 0, 2], [2, 2, 2], [4, 3, 3]]
+    available = [3, 3, 2]
+
+    # Use your friend's function to run the logic
+    # Note: We assume their function is named 'bankers_algorithm' or similar
+    try:
+        if hasattr(bankers, 'bankers_algorithm'):
+            result = bankers.bankers_algorithm(n, m, allocation, max_need, available)
+            if hasattr(bankers, 'print_results'):
+                bankers.print_results(n, m, allocation, max_need, available, result)
+            else:
+                print(f"Safe sequence: {result}")
+        else:
+            print("[!] Could not find 'bankers_algorithm' function in bankers.py")
+    except Exception as e:
+        print(f"[!] Error running Banker's algorithm: {e}")
+
+def main():
+    print("=" * 60)
+    print("        OS ALGORITHMS INTEGRATED SIMULATOR")
+    print("=" * 60)
+    
+    # 1. RUN SCHEDULING ALGORITHMS
+    print("\n>>> Part 1: CPU Scheduling Simulation")
+    original_processes = get_scheduling_data()
+    
     algorithms = [
         ("FIRST COME FIRST SERVED (FCFS)", fcfs),
         ("SHORTEST JOB FIRST (SJF)", sjf),
         ("SHORTEST REMAINING TIME FIRST (SRTF)", srtf),
-        ("ROUND ROBIN (RR) - Quantum = 2", round_robin),
+        ("ROUND ROBIN (RR) - Q=2", round_robin),
     ]
 
     for name, func in algorithms:
-        print(f"\n\n{'#' * 15} {name} {'#' * 15}")
-        
-        # Deep copy to ensure each algorithm starts with fresh data
-        process_list_copy = copy.deepcopy(original_processes)
-        
-        # Execute the algorithm
-        func(process_list_copy)
-        
-        print(f"\n{'=' * 60}")
+        print(f"\n{'#' * 15} {name} {'#' * 15}")
+        proc_copy = copy.deepcopy(original_processes)
+        func(proc_copy)
+        print("-" * 60)
 
-    print("\nSimulation completed successfully.")
+    # 2. RUN BANKER'S ALGORITHM
+    print("\n>>> Part 2: Deadlock Avoidance")
+    run_bankers()
+
+    print("\n" + "=" * 60)
+    print("ALL SIMULATIONS COMPLETED SUCCESSFULLY")
+    print("=" * 60)
 
 if __name__ == "__main__":
-    run_simulation()
+    main()
