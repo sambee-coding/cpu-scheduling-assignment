@@ -1,110 +1,79 @@
-"""
-Main entry point for the CPU Scheduling & Banker's Algorithm Assignment.
-Runs all algorithms on sample data and prints results.
-"""
+import copy
+from models import Process
+from fcfs import fcfs
+from sjf import sjf
+from srtf import srtf
+from round_robin import round_robin
 
-import sys
-import os
+def get_sample_data():
+    """Returns a predefined list of Process objects for simulation."""
+    return [
+        Process(pid=1, arrival_time=0, burst_time=8),
+        Process(pid=2, arrival_time=1, burst_time=4),
+        Process(pid=3, arrival_time=2, burst_time=9),
+        Process(pid=4, arrival_time=3, burst_time=5),
+    ]
 
-# Make sure src/ modules are importable when running from project root
-sys.path.insert(0, os.path.dirname(__file__))
+def get_user_input():
+    """Reads process data from the terminal."""
+    processes = []
+    print("\n--- Manual Process Entry ---")
+    print("Format: <PID_as_integer> <Arrival_Time> <Burst_Time> (e.g., 1 0 7)")
+    print("Type 'done' to finish.")
+    
+    while True:
+        line = input("> ").strip().lower()
+        if line == 'done':
+            break
+        try:
+            parts = list(map(int, line.split()))
+            if len(parts) == 3:
+                processes.append(Process(pid=parts[0], arrival_time=parts[1], burst_time=parts[2]))
+            else:
+                print("Invalid format. Use: PID AT BT")
+        except ValueError:
+            print("Invalid input. Please enter integers only.")
+    return processes
 
-import fcfs
-import sjf
-import srtf
-import round_robin
-import bankers
-
-
-# ─────────────────────────────────────────────
-# Sample Processes for Scheduling Algorithms
-# ─────────────────────────────────────────────
-PROCESSES = [
-    {"pid": "P1", "arrival_time": 0, "burst_time": 8},
-    {"pid": "P2", "arrival_time": 1, "burst_time": 4},
-    {"pid": "P3", "arrival_time": 2, "burst_time": 9},
-    {"pid": "P4", "arrival_time": 3, "burst_time": 5},
-]
-
-QUANTUM = 3  # Time quantum for Round Robin
-
-
-# ─────────────────────────────────────────────
-# Sample Data for Banker's Algorithm
-# ─────────────────────────────────────────────
-NUM_PROCESSES = 5
-NUM_RESOURCES = 3
-
-ALLOCATION = [
-    [0, 1, 0],
-    [2, 0, 0],
-    [3, 0, 2],
-    [2, 1, 1],
-    [0, 0, 2],
-]
-
-MAX_NEED = [
-    [7, 5, 3],
-    [3, 2, 2],
-    [9, 0, 2],
-    [2, 2, 2],
-    [4, 3, 3],
-]
-
-AVAILABLE = [3, 3, 2]
-
-
-def run_scheduling_algorithms():
+def run_simulation():
     print("=" * 60)
-    print("       CPU SCHEDULING ALGORITHMS")
+    print("        OS CPU SCHEDULING ALGORITHM SIMULATOR")
     print("=" * 60)
-    print(f"\nProcesses: {[p['pid'] for p in PROCESSES]}")
+    
+    # Choose input method
+    choice = input("Use sample data? (y/n): ").strip().lower()
+    if choice == 'y':
+        original_processes = get_sample_data()
+    else:
+        original_processes = get_user_input()
+        
+    if not original_processes:
+        print("No processes to schedule. Exiting.")
+        return
 
-    # FCFS
-    fcfs_results = fcfs.fcfs(PROCESSES)
-    fcfs.print_results(fcfs_results)
+    # List of algorithms to run
+    # Format: (Display Name, Function, [optional extra args])
+    algorithms = [
+        ("FIRST COME FIRST SERVED (FCFS)", fcfs),
+        ("SHORTEST JOB FIRST (SJF)", sjf),
+        ("SHORTEST REMAINING TIME FIRST (SRTF)", srtf),
+        ("ROUND ROBIN (RR) - Quantum = 2", round_robin),
+    ]
 
-    # SJF
-    sjf_results = sjf.sjf(PROCESSES)
-    sjf.print_results(sjf_results)
+    for name, func in algorithms:
+        print(f"\n\n{'#' * 15} {name} {'#' * 15}")
+        
+        # CRITICAL: Deep copy to prevent mutation of original arrival/burst times
+        # and to ensure each algorithm starts with a fresh list of Process objects.
+        process_list_copy = copy.deepcopy(original_processes)
+        
+        # Execute the algorithm
+        # All algorithms are now standardized to call their own print_table and print_gantt_chart
+        func(process_list_copy)
+        
+        print(f"\n{'=' * 60}")
 
-    # SRTF
-    srtf_results = srtf.srtf(PROCESSES)
-    srtf.print_results(srtf_results)
-
-    # Round Robin
-    rr_results = round_robin.round_robin(PROCESSES, QUANTUM)
-    round_robin.print_results(rr_results, QUANTUM)
-
-
-def run_bankers_algorithm():
-    print("\n" + "=" * 60)
-    print("         BANKER'S ALGORITHM")
-    print("=" * 60)
-
-    result = bankers.bankers_algorithm(
-        NUM_PROCESSES, NUM_RESOURCES,
-        ALLOCATION, MAX_NEED, AVAILABLE
-    )
-    bankers.print_results(
-        NUM_PROCESSES, NUM_RESOURCES,
-        ALLOCATION, MAX_NEED, AVAILABLE,
-        result
-    )
-
-    # Example: P1 requests [1, 0, 2]
-    print("\n--- Resource Request Test ---")
-    req_pid = 1
-    request = [1, 0, 2]
-    print(f"P{req_pid} requests: {request}")
-    req_result = bankers.request_resources(
-        req_pid, request,
-        ALLOCATION, MAX_NEED, AVAILABLE,
-        NUM_RESOURCES
-    )
-    print(f"Result: {req_result['message']}")
-
+    print("\nSimulation completed successfully.")
 
 if __name__ == "__main__":
-    run_scheduling_algorithms()
-    run_bankers_algorithm()
+    run_simulation()
