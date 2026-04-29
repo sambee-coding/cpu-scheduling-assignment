@@ -2,7 +2,7 @@
 
 A professional, modular Python implementation of core Operating Systems algorithms, including various CPU Scheduling techniques and the Banker's Algorithm for deadlock avoidance.
 
-## 🚀 Features
+## Features
 
 ### CPU Scheduling Algorithms
 All scheduling algorithms are implemented in a preemptive/non-preemptive manner with visual Gantt chart outputs and detailed performance metrics (CT, TAT, WT).
@@ -14,14 +14,14 @@ All scheduling algorithms are implemented in a preemptive/non-preemptive manner 
 ### Deadlock Avoidance
 - **Banker's Algorithm**: Determines system safety and finds safe execution sequences for resource allocation.
 
-## 🛠️ Project Structure
+## Project Structure
 
 - `src/main.py`: The central entry point for running all simulations.
 - `src/models.py`: Shared data structures (Process class) and utility functions for metrics and visualization.
 - `src/fcfs.py`, `src/sjf.py`, `src/srtf.py`, `src/round_robin.py`: Individual scheduling algorithm implementations.
 - `src/bankers.py`: Banker's algorithm logic.
 
-## 💻 Usage
+## Usage
 
 1. **Clone the repository**:
    ```bash
@@ -36,7 +36,7 @@ All scheduling algorithms are implemented in a preemptive/non-preemptive manner 
 
 3. **Follow the on-screen prompts** to use sample data or enter your own process details.
 
-## 📊 Sample Output (Scheduling)
+## Sample Output (Scheduling)
 ```text
 PID   | Arrival  | Burst  | CT    | TAT   | WT   
 --------------------------------------------------
@@ -51,7 +51,7 @@ Average Turnaround Time: 13.00
 0       1       5       10      17      26
 ```
 
-## 🤝 Team Contribution
+## Team Contribution
 This project was developed collaboratively with a focus on professional integration standards:
 - **Integration Leader**: Unified all algorithms and standardized data models.
 - **Algorithm Developers**: Implemented individual scheduling and deadlock avoidance logic.
