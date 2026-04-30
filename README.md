@@ -1,6 +1,6 @@
 # OS Algorithms Simulator
 
-A professional, modular Python implementation of core Operating Systems algorithms, including various CPU Scheduling techniques and the Banker's Algorithm for deadlock avoidance.
+A modular Python implementation of core Operating Systems algorithms, including various CPU Scheduling techniques and the Banker's Algorithm for deadlock avoidance.
 
 ## Features
 
