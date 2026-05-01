@@ -50,10 +50,15 @@ Average Turnaround Time: 13.00
 0       1       5       10      17      26
 ```
 
-## Team Contribution
-This project was developed collaboratively with a focus on professional integration standards:
-- **Integration Leader**: Unified all algorithms and standardized data models.
-- **Algorithm Developers**: Implemented individual scheduling and deadlock avoidance logic.
+## Team Contribution — Group 6
+- **BDU1602358** - SAMRAWIT
+- **BDU1602362** - SAMRAWIT
+- **BDU1602390** - SEID TILAHUN
+- **BDU1602442** - SIMRET ABEBE
+- **BDU1602454** - SISAY TEMESGEN
+- **BDU1602459** - SIYADLE DUBALE
+- **BDU1602479** - SOSINA SHEGAW
+- **BDU1602482** - SUNAN ALI
 
 ---
-*Developed for the Operating Systems Course Assignment.*
+*Developed for the Operating Systems Course Assignment (Section 4).*
