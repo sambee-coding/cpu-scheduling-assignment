@@ -1,6 +1,4 @@
-from models import Process, calculate_metrics, print_table, print_gantt_chart
-
-def sjf_non_preemptive(processes: list[Process]):
+def sjf_non_preemptive(processes):
     """
     Implementation of Shortest Job First (SJF) scheduling algorithm (Non-preemptive).
     """
@@ -17,11 +15,15 @@ def sjf_non_preemptive(processes: list[Process]):
         ]
         
         if not available_processes:
-            next_arrival = min(p.arrival_time for i, p in enumerate(processes) if not is_completed[i])
-            gantt_chart.append((current_time, next_arrival, "IDLE"))
-            current_time = next_arrival
+            # Find the next arrival time to jump current_time
+            not_completed = [p.arrival_time for i, p in enumerate(processes) if not is_completed[i]]
+            if not_completed:
+                next_arrival = min(not_completed)
+                gantt_chart.append((current_time, next_arrival, "IDLE"))
+                current_time = next_arrival
             continue
             
+        # Select process with minimum burst time
         idx, p = min(available_processes, key=lambda x: (x[1].burst_time, x[1].arrival_time))
         
         start_time = current_time
@@ -32,8 +34,4 @@ def sjf_non_preemptive(processes: list[Process]):
         
         gantt_chart.append((start_time, current_time, f"P{p.pid}"))
         
-    avg_wt, avg_tat = calculate_metrics(processes)
-    print_table(processes)
-    print(f"\nAverage Waiting Time: {avg_wt:.2f}")
-    print(f"Average Turnaround Time: {avg_tat:.2f}")
-    print_gantt_chart(gantt_chart)
+    return gantt_chart

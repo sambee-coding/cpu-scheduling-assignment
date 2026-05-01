@@ -1,6 +1,4 @@
-from models import Process, calculate_metrics, print_table, print_gantt_chart
-
-def fcfs(processes: list[Process]):
+def fcfs(processes):
     """
     Implementation of First Come First Served (FCFS) scheduling algorithm.
     """
@@ -22,9 +20,4 @@ def fcfs(processes: list[Process]):
         
         gantt_chart.append((start_time, current_time, f"P{p.pid}"))
         
-    # Calculate metrics and display
-    avg_wt, avg_tat = calculate_metrics(processes)
-    print_table(processes)
-    print(f"\nAverage Waiting Time: {avg_wt:.2f}")
-    print(f"Average Turnaround Time: {avg_tat:.2f}")
-    print_gantt_chart(gantt_chart)
+    return gantt_chart

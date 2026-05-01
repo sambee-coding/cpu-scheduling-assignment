@@ -1,14 +1,57 @@
 import copy
-from models import Process
+from dataclasses import dataclass
 from fcfs import fcfs
 from sjf import sjf_non_preemptive
 from srtf import srtf
 from round_robin import round_robin
-# Import Banker's algorithm
-try:
-    import bankers
-except ImportError:
-    bankers = None
+from bankers import bankers_algorithm, print_results, input_bankers_data
+
+@dataclass
+class Process:
+    """Represents a process for CPU scheduling."""
+    pid: str
+    arrival_time: int
+    burst_time: int
+    remaining_time: int = 0
+    completion_time: int = 0
+    turnaround_time: int = 0
+    waiting_time: int = 0
+
+    def __post_init__(self):
+        self.remaining_time = self.burst_time
+
+def calculate_metrics(processes):
+    """Calculates TAT and WT for a list of completed processes."""
+    total_wt = 0
+    total_tat = 0
+    for p in processes:
+        p.turnaround_time = p.completion_time - p.arrival_time
+        p.waiting_time = p.turnaround_time - p.burst_time
+        total_wt += p.waiting_time
+        total_tat += p.turnaround_time
+    
+    avg_wt = total_wt / len(processes) if processes else 0
+    avg_tat = total_tat / len(processes) if processes else 0
+    return avg_wt, avg_tat
+
+def print_table(processes):
+    """Prints the process metrics in a formatted table."""
+    print(f"\n{'PID':<5} | {'Arrival':<8} | {'Burst':<6} | {'CT':<5} | {'TAT':<5} | {'WT':<5}")
+    print("-" * 50)
+    # Sort by PID for consistent output
+    for p in sorted(processes, key=lambda x: x.pid):
+        print(f"{p.pid:<5} | {p.arrival_time:<8} | {p.burst_time:<6} | {p.completion_time:<5} | {p.turnaround_time:<5} | {p.waiting_time:<5}")
+
+def print_gantt_chart(gantt_chart):
+    """Prints a visual Gantt chart representation."""
+    print("\n--- Gantt Chart ---")
+    for _, _, label in gantt_chart:
+        print(f"|  {label}  ", end="")
+    print("|")
+    for start, _, _ in gantt_chart:
+        print(f"{start:<8}", end="")
+    if gantt_chart:
+        print(gantt_chart[-1][1])
 
 def get_scheduling_data():
     """Returns sample process data for scheduling from the assignment example."""
@@ -20,10 +63,7 @@ def get_scheduling_data():
     ]
 
 def input_processes():
-    """
-    Reads process data from the terminal.
-    Matches the 'input_processes()' requirement in the assignment diagram.
-    """
+    """Reads process data from terminal as required by Section 4."""
     processes = []
     try:
         n_str = input("\nEnter number of processes: ").strip()
@@ -34,75 +74,62 @@ def input_processes():
         for _ in range(n):
             line = input("> ").strip()
             parts = line.split()
-            if len(parts) == 3:
+            if len(parts) >= 3:
                 pid = parts[0]
                 at = int(parts[1])
                 bt = int(parts[2])
                 processes.append(Process(pid=pid, arrival_time=at, burst_time=bt))
             else:
-                print("Invalid format. Skipping this entry.")
+                print("Invalid format. Skipping.")
     except ValueError:
-        print("Invalid input. Please use integers for Arrival/Burst.")
+        print("Invalid input.")
     return processes
 
 def run_bankers():
-    """Runs the Banker's algorithm simulation."""
-    if not bankers:
-        print("\n[!] banker's algorithm module not found.")
-        return
+    """Runs the Banker's algorithm simulation with manual or sample data."""
+    print("\n>>> Part 2: Deadlock Avoidance (Banker's Algorithm)")
+    print("1. Use Assignment Sample Data")
+    print("2. Enter data manually")
+    choice = input("Choice: ").strip()
 
-    print("\n" + "=" * 60)
-    print("         BANKER'S ALGORITHM (Deadlock Avoidance)")
-    print("=" * 60)
+    if choice == '2':
+        data = input_bankers_data()
+        if not data: return
+        n, m, alloc, max_n, avail = data
+    else:
+        # Sample Data from instructions
+        n, m = 5, 3
+        alloc = [[0, 1, 0], [2, 0, 0], [3, 0, 2], [2, 1, 1], [0, 0, 2]]
+        max_n = [[7, 5, 3], [3, 2, 2], [9, 0, 2], [2, 2, 2], [4, 3, 3]]
+        avail = [3, 3, 2]
 
-    # Sample Data
-    n = 5 # Processes
-    m = 3 # Resources
-    allocation = [[0, 1, 0], [2, 0, 0], [3, 0, 2], [2, 1, 1], [0, 0, 2]]
-    max_need = [[7, 5, 3], [3, 2, 2], [9, 0, 2], [2, 2, 2], [4, 3, 3]]
-    available = [3, 3, 2]
-
-    try:
-        if hasattr(bankers, 'bankers_algorithm'):
-            result = bankers.bankers_algorithm(n, m, allocation, max_need, available)
-            if hasattr(bankers, 'print_results'):
-                bankers.print_results(n, m, allocation, max_need, available, result)
-            else:
-                print(f"Safe sequence: {result}")
-    except Exception as e:
-        print(f"[!] Error running Banker's algorithm: {e}")
+    result = bankers_algorithm(n, m, alloc, max_n, avail)
+    print_results(n, m, alloc, max_n, avail, result)
 
 def main():
-    """
-    Main entry point. 
-    Orchestrates the simulation as required by the assignment structure.
-    """
+    """Main orchestrator satisfying Requirement 4."""
     print("=" * 60)
     print("        OS ALGORITHMS INTEGRATED SIMULATOR")
     print("=" * 60)
     
-    # Choose input method
-    print("\nHow would you like to provide process data?")
-    print("1. Use Assignment Sample Data (P1-P4)")
-    print("2. Enter data manually (input_processes)")
-    choice = input("Choice (1 or 2): ").strip()
+    print("\nHow would you like to provide scheduling data?")
+    print("1. Use Assignment Sample Data")
+    print("2. Enter data manually")
+    choice = input("Choice: ").strip()
 
     if choice == '2':
         original_processes = input_processes()
     else:
-        print("\nUsing Assignment Sample Data...")
         original_processes = get_scheduling_data()
         
     if not original_processes:
-        print("No processes to schedule. Exiting.")
+        print("No processes found.")
         return
 
-    # RUN SCHEDULING ALGORITHMS
-    print("\n>>> Part 1: CPU Scheduling Simulation")
-    
+    # Scheduling algorithms execution
     algorithms = [
         ("FIRST COME FIRST SERVED (FCFS)", fcfs),
-        ("SHORTEST JOB FIRST (SJF)", sjf_non_preemptive),
+        ("NON-PREEMPTIVE SJF", sjf_non_preemptive),
         ("SHORTEST REMAINING TIME FIRST (SRTF)", srtf),
         ("ROUND ROBIN (RR) - Q=2", round_robin),
     ]
@@ -110,11 +137,17 @@ def main():
     for name, func in algorithms:
         print(f"\n{'#' * 15} {name} {'#' * 15}")
         proc_copy = copy.deepcopy(original_processes)
-        func(proc_copy)
+        gantt = func(proc_copy)
+        
+        # Calculate and display common metrics
+        avg_wt, avg_tat = calculate_metrics(proc_copy)
+        print_table(proc_copy)
+        print(f"\nAverage Waiting Time: {avg_wt:.2f}")
+        print(f"Average Turnaround Time: {avg_tat:.2f}")
+        print_gantt_chart(gantt)
         print("-" * 60)
 
-    # RUN BANKER'S ALGORITHM
-    print("\n>>> Part 2: Deadlock Avoidance")
+    # Banker's algorithm execution
     run_bankers()
 
     print("\n" + "=" * 60)

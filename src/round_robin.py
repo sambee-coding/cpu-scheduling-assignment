@@ -1,7 +1,6 @@
 from collections import deque
-from models import Process, calculate_metrics, print_table, print_gantt_chart
 
-def round_robin(processes: list[Process], quantum: int = 2):
+def round_robin(processes, quantum: int = 2):
     """
     Implementation of Round Robin (RR) scheduling algorithm.
     """
@@ -24,8 +23,10 @@ def round_robin(processes: list[Process], quantum: int = 2):
 
     while completed < n:
         if not ready_queue:
-            next_arrival = min((p.arrival_time for p in processes if not added_to_queue[processes.index(p)]), default=None)
-            if next_arrival is not None:
+            # Find next arrival if queue is empty
+            not_added = [p.arrival_time for i, p in enumerate(processes) if not added_to_queue[i]]
+            if not_added:
+                next_arrival = min(not_added)
                 gantt_chart.append((current_time, next_arrival, "IDLE"))
                 current_time = next_arrival
                 add_arrived_processes()
@@ -48,8 +49,4 @@ def round_robin(processes: list[Process], quantum: int = 2):
         else:
             ready_queue.append(process)
 
-    avg_wt, avg_tat = calculate_metrics(processes)
-    print_table(processes)
-    print(f"\nAverage Waiting Time: {avg_wt:.2f}")
-    print(f"Average Turnaround Time: {avg_tat:.2f}")
-    print_gantt_chart(gantt_chart)
+    return gantt_chart

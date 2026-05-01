@@ -1,6 +1,4 @@
-from models import Process, calculate_metrics, print_table, print_gantt_chart
-
-def srtf(processes: list[Process]):
+def srtf(processes):
     """
     Implementation of Shortest Remaining Time First (SRTF) scheduling algorithm.
     """
@@ -43,8 +41,4 @@ def srtf(processes: list[Process]):
             gantt_chart.append((start_time, current_time, f"P{current_process.pid}"))
             last_pid = None
 
-    avg_wt, avg_tat = calculate_metrics(processes)
-    print_table(processes)
-    print(f"\nAverage Waiting Time: {avg_wt:.2f}")
-    print(f"Average Turnaround Time: {avg_tat:.2f}")
-    print_gantt_chart(gantt_chart)
+    return gantt_chart

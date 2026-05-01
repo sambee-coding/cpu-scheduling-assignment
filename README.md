@@ -16,10 +16,9 @@ All scheduling algorithms are implemented in a preemptive/non-preemptive manner 
 
 ## Project Structure
 
-- `src/main.py`: The central entry point for running all simulations.
-- `src/models.py`: Shared data structures (Process class) and utility functions for metrics and visualization.
+- `src/main.py`: The central entry point for running all simulations (Requirement 4).
 - `src/fcfs.py`, `src/sjf.py`, `src/srtf.py`, `src/round_robin.py`: Individual scheduling algorithm implementations.
-- `src/bankers.py`: Banker's algorithm logic.
+- `src/bankers.py`: Banker's algorithm logic (Requirement 5).
 
 ## Usage
 
