@@ -2,6 +2,16 @@
 
 A modular Python implementation of core Operating Systems algorithms, including various CPU Scheduling techniques and the Banker's Algorithm for deadlock avoidance.
 
+## Team Contribution — Group 6
+- **BDU1602358** - SAMRAWIT Bitew
+- **BDU1602362** - SAMRAWIT Yirga
+- **BDU1602390** - SEID TILAHUN
+- **BDU1602442** - SIMRET ABEBE
+- **BDU1602454** - SISAY TEMESGEN
+- **BDU1602459** - SIYADLE DUBALE
+- **BDU1602479** - SOSINA SHEGAW
+- **BDU1602482** - SUNAN ALI
+
 ## Features
 
 ### CPU Scheduling Algorithms
@@ -49,16 +59,6 @@ Average Turnaround Time: 13.00
 |  P1  |  P2  |  P4  |  P1  |  P3  |
 0       1       5       10      17      26
 ```
-
-## Team Contribution — Group 6
-- **BDU1602358** - SAMRAWIT
-- **BDU1602362** - SAMRAWIT
-- **BDU1602390** - SEID TILAHUN
-- **BDU1602442** - SIMRET ABEBE
-- **BDU1602454** - SISAY TEMESGEN
-- **BDU1602459** - SIYADLE DUBALE
-- **BDU1602479** - SOSINA SHEGAW
-- **BDU1602482** - SUNAN ALI
 
 ---
 *Developed for the Operating Systems Course Assignment (Section 4).*
